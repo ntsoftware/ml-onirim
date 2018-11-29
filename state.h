@@ -1,6 +1,7 @@
 #pragma once
 
 static const size_t INIT_VALUES[N_COLORS][N_SYMBOLS] = {
+  // suns, moons, keys
   { 9, 4, 3 },
   { 8, 4, 3 },
   { 7, 4, 3 },
@@ -16,6 +17,8 @@ class State {
     std::vector<Card> discard_pile;
 
     std::vector<Card> limbo_pile;
+
+    std::vector<Card> hand;
 
     std::array<int, N_COLORS> n_open_doors;
 
@@ -76,19 +79,38 @@ class State {
       return v;
     }
 
-    void set_aside(const Card& c) {
+    void put_into_draw_pile(const std::vector<Card>& v) {
+      draw_pile.insert(std::end(draw_pile), std::begin(v), std::end(v));
+    }
+
+    void put_into_limbo_pile(const Card& c) {
       assert(c.is_door() || c.is_nightmare());
       limbo_pile.push_back(c);
+    }
+
+    void put_into_hand(const Card& c) {
+      assert(c.is_location());
+      assert(hand.size() < 5);
+      hand.push_back(c);
+    }
+
+    bool hand_is_full() const {
+      return hand_size() == 5;
+    }
+
+    bool draw_pile_is_empty() const {
+      return draw_pile.empty();
+    }
+
+    bool limbo_pile_is_empty() const {
+      return limbo_pile.empty();
     }
 
     friend std::ostream& operator<< (std::ostream&, const State&);
 };
 
 std::ostream& operator<< (std::ostream& os, const State& s) {
-  os << "draw pile:" << std::endl;
-  for (const auto& c : s.draw_pile) {
-    os << c << std::endl;
-  }
+  // TODO
   return os;
 }
 
